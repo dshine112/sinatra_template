@@ -18,4 +18,4 @@ gem 'rake'
 
 gem 'shotgun'
 
-gem 'Faker'
+gem 'faker'
