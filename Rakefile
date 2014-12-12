@@ -28,6 +28,70 @@ namespace :generate do
     end
   end
 
+  task :resource do
+    desc "Create a resource file in app/controllers, e.g., rake generate:resource NAME=User"
+    unless ENV.has_key?('NAME')
+      raise "Must specificy resource name, e.g., rake generate:resource NAME=User"
+    end
+
+
+    resource_name     = ENV['NAME'].downcase
+    resource_filename = ENV['NAME'].underscore + '.rb'
+    resource_path = APP_ROOT.join('app', 'controllers', resource_filename)
+
+    plural_resource_name = resource_name.pluralize
+    cap_resource_name    = ENV['NAME'].capitalize
+
+
+    puts "Creating #{resource_name}"
+    File.open(resource_path, 'w+') do |f|
+      f.write(<<-EOF.strip_heredoc)
+        get '/#{plural_resource_name}' do
+          # display a list of all #{plural_resource_name}
+          # @#{plural_resource_name} = #{cap_resource_name}.all
+          # erb :'#{plural_resource_name}/index'
+        end
+
+        get '/#{plural_resource_name}/new' do
+          # return an HTML form for creating a new #{resource_name}
+          # erb :'#{plural_resource_name}/new'
+        end
+
+        post '/#{plural_resource_name}' do
+          # create a new #{resource_name}
+          # @#{resource_name} = #{cap_resource_name}.create(params[:#{resource_name}])
+          # redirect '/#{plural_resource_name}'
+        end
+
+        get '/#{plural_resource_name}/:id' do |id|
+          # display a specific #{resource_name}
+          # @#{resource_name} = #{cap_resource_name}.find id
+          # erb :'#{plural_resource_name}/single'
+        end
+
+        get '/#{plural_resource_name}/:id/edit' do |id|
+          # return an HTML form for editing a #{resource_name}
+          # @#{resource_name} = #{cap_resource_name}.find id
+          # erb :'#{plural_resource_name}/edit'
+        end
+
+        put '/#{plural_resource_name}/:id' do |id|
+          # update a specific #{resource_name}
+          # @#{resource_name} = #{cap_resource_name}.find id
+          # @#{resource_name}.update(params[:#{resource_name}])
+          redirect 'entries/\#\{@#{resource_name}.id\}'
+        end
+
+        delete '/#{plural_resource_name}/:id' do |id|
+          # delete a specific #{resource_name}
+          # @#{resource_name} = #{cap_resource_name}.find id
+          # @#{resource_name}.destroy
+          # redirect '/#{plural_resource_name}'
+        end
+      EOF
+    end
+  end
+
   desc "Create an empty migration in db/migrate, e.g., rake generate:migration NAME=create_tasks"
   task :migration do
     unless ENV.has_key?('NAME')
